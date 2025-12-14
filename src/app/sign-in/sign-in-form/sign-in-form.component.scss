@@ -1,0 +1,35 @@
+form {
+  margin: 1rem;
+  text-align: center;
+}
+
+h5 {
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.334;
+  letter-spacing: 0em;
+  margin: 0px 0px 0.35em;
+}
+
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+h6 {
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  letter-spacing: 0.0075em;
+  margin: 0px 0px 1.5rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.submit-button {
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  width: 100%;
+}
