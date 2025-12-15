@@ -8,6 +8,11 @@
     <mat-label>Email</mat-label>
     <!-- TODO: autofocus this element when the view renders -->
     <input matInput formControlName="email" />
+    @if (signInForm.controls.email.errors?.['required']) {
+    <mat-error>The email is required</mat-error>
+    } @if (signInForm.controls.email.errors?.['email']) {
+    <mat-error>Please enter a valid email address</mat-error>
+    }
   </mat-form-field>
 
   <mat-form-field appearance="outline">
@@ -26,6 +31,9 @@
     >
       <mat-icon>{{ signInForm.value.showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
+    @if (signInForm.controls.password.errors?.['required']) {
+    <mat-error>The password is required</mat-error>
+    }
   </mat-form-field>
 
   <button matButton="filled" type="submit" class="submit-button">Sign in</button>
