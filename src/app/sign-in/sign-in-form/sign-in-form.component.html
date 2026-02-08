@@ -1,17 +1,26 @@
-<form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="signInForm" (ngSubmit)="handleSubmit()">
   <!-- TODO: get the title from a central source -->
   <h5><a routerLink="/">Alchemist</a></h5>
 
   <h6>Sign In</h6>
 
+  @if (errorMessages().length > 0) {
+    <div class="error-banner">
+      @for (message of errorMessages(); track message) {
+        <div>{{ message }}</div>
+      }
+    </div>
+  }
+
   <mat-form-field appearance="outline">
     <mat-label>Email</mat-label>
-    <!-- TODO: autofocus this element when the view renders -->
+    <!-- TODO: autofocus the email input when the view renders -->
     <input matInput formControlName="email" />
     @if (signInForm.controls.email.errors?.['required']) {
-    <mat-error>The email is required</mat-error>
-    } @if (signInForm.controls.email.errors?.['email']) {
-    <mat-error>Please enter a valid email address</mat-error>
+      <mat-error>The email is required</mat-error>
+    }
+    @if (signInForm.controls.email.errors?.['email']) {
+      <mat-error>The email address is not valid</mat-error>
     }
   </mat-form-field>
 
@@ -32,9 +41,18 @@
       <mat-icon>{{ signInForm.value.showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
     @if (signInForm.controls.password.errors?.['required']) {
-    <mat-error>The password is required</mat-error>
+      <mat-error>The password is required</mat-error>
     }
   </mat-form-field>
 
-  <button matButton="filled" type="submit" class="submit-button">Sign in</button>
+  <button matButton="filled" type="submit" class="submit-button" [disabled]="isLoading()">
+    <span class="button-wrapper">
+      @if (isLoading()) {
+        <mat-spinner [diameter]="18"></mat-spinner>
+        Signing in...
+      } @else {
+        Sign in
+      }
+    </span>
+  </button>
 </form>

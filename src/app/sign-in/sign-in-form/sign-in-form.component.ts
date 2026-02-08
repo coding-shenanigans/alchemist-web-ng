@@ -1,11 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../auth-service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthApi } from '../../auth-api';
+import { finalize } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-sign-in-form',
@@ -16,20 +18,24 @@ import { AuthService } from '../../auth-service';
     MatFormFieldModule,
     ReactiveFormsModule,
     RouterLink,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './sign-in-form.component.html',
   styleUrl: './sign-in-form.component.scss',
 })
 export class SignInForm {
-  errorMessage = signal('');
+  private formBuilder = inject(FormBuilder).nonNullable;
+  private router = inject(Router);
+  private authApi = inject(AuthApi);
 
-  signInForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
-    showPassword: new FormControl(false),
+  isLoading = signal(false);
+  errorMessages = signal<string[]>([]);
+
+  signInForm = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+    showPassword: [false],
   });
-
-  constructor(private authService: AuthService) {}
 
   toggleShowPassword(event: MouseEvent) {
     event.preventDefault();
@@ -37,50 +43,29 @@ export class SignInForm {
     this.signInForm.controls.showPassword.setValue(!currentValue);
   }
 
-  onSubmit() {
+  handleSubmit() {
     if (this.signInForm.invalid) {
       return;
     }
 
-    this.errorMessage.set('');
+    this.isLoading.set(true);
+    this.errorMessages.set([]);
 
-    // TODO: do not submit the exclamation marks!
-    this.authService
-      .signIn(this.signInForm.value.email!, this.signInForm.value.password!)
+    const { email, password } = this.signInForm.getRawValue();
+
+    this.authApi
+      .signIn(email, password)
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (data) => {
-          console.log('Data fetched successfully:', data);
+          // TODO: set user in app state
+          console.log('Signed in successfully:', data);
+          this.router.navigate(['/']);
         },
-        error: (err) => {
-          console.error('Error fetching data:', err);
-        },
-        complete: () => {
-          console.log('Observable completed.');
+        error: (error) => {
+          console.error('Failed to sign in:', error);
+          this.errorMessages.set(error.error?.errors ?? ['unknown error']);
         },
       });
   }
-
-  // onSubmit2(): void {
-  //   const credentials: SignInCredentials = this.signInForm.value;
-
-  //   // 1. Call the service to send the request
-  //   this.authService.signIn(credentials).subscribe({
-  //     next: (response) => {
-  //       // 2. SUCCESS: Handle successful sign-in
-  //       console.log('Sign-in successful!', response);
-
-  //       // A common step is to store the received token (e.g., in localStorage)
-  //       // localStorage.setItem('auth_token', response.token);
-
-  //       // 3. Redirect the user
-  //       this.router.navigate(['/dashboard']);
-  //     },
-  //     error: (error) => {
-  //       // 4. ERROR: Handle API errors (e.g., invalid credentials)
-  //       console.error('Sign-in error:', error);
-  //       // Display a user-friendly error message from the backend response
-  //       this.errorMessage = error.error?.message || 'Invalid email or password.';
-  //     },
-  //   });
-  // }
 }

@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 form {
   margin: 1rem;
   text-align: center;
@@ -33,4 +35,28 @@ mat-form-field {
   border-radius: 4px;
   margin-bottom: 1rem;
   width: 100%;
+}
+
+button {
+  @include mat.progress-spinner-overrides(
+    (
+      active-indicator-color: var(--mat-sys-on-primary),
+    )
+  );
+}
+
+.button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.error-banner {
+  background-color: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
 }
