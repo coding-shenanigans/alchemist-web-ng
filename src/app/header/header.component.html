@@ -2,6 +2,11 @@
   <!-- TODO: get the title from a central source -->
   <span class="title"><a routerLink="/">Alchemist</a></span>
 
-  <a matButton="filled" routerLink="/signin">Sign in</a>
-  <a matButton="filled" routerLink="/signup">Sign up</a>
+  @if (userSession$ | async; as userSession) {
+    <!-- TODO: display an avatar with a user menu -->
+    <span>Hello {{ userSession.username }}!</span>
+  } @else {
+    <a matButton="filled" routerLink="/signin">Sign in</a>
+    <a matButton="filled" routerLink="/signup">Sign up</a>
+  }
 </mat-toolbar>

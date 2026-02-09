@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 interface UserSession {
   email: string;
@@ -20,6 +20,9 @@ export class AuthApi {
   // TODO: move the base url to a config file
   private readonly baseUrl = 'http://localhost:9000';
 
+  private userSession = new BehaviorSubject<UserSession | null>(null);
+  public userSession$: Observable<UserSession | null> = this.userSession.asObservable();
+
   /**
    * Sends a sign in request to the backend.
    * @param email The user's email.
@@ -27,6 +30,12 @@ export class AuthApi {
    * @returns A SignInResponse object.
    */
   signIn(email: string, password: string): Observable<SignInResponse> {
-    return this.http.post<SignInResponse>(`${this.baseUrl}/auth/signin`, { email, password });
+    return this.http.post<SignInResponse>(`${this.baseUrl}/auth/signin`, { email, password }).pipe(
+      tap((signInResponse) => {
+        this.userSession.next(signInResponse.userSession);
+        // TODO: read the user session from local storage when the page is refreshed
+        localStorage.setItem('userSession', JSON.stringify(signInResponse.userSession));
+      }),
+    );
   }
 }

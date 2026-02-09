@@ -57,9 +57,7 @@ export class SignInForm {
       .signIn(email, password)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (data) => {
-          // TODO: set user in app state
-          console.log('Signed in successfully:', data);
+        next: (_data) => {
           this.router.navigate(['/']);
         },
         error: (error) => {
