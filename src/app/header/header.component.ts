@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
+import { AuthApi } from '../auth-api';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-header',
-  imports: [MatButtonModule, MatToolbarModule, RouterLink],
+  imports: [MatButtonModule, MatToolbarModule, RouterLink, AsyncPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class Header {}
+export class Header {
+  private authApi = inject(AuthApi);
+
+  userSession$ = this.authApi.userSession$;
+}
