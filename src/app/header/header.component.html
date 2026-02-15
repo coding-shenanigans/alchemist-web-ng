@@ -3,8 +3,15 @@
   <span class="title"><a routerLink="/">Alchemist</a></span>
 
   @if (userSession$ | async; as userSession) {
-    <!-- TODO: display an avatar with a user menu -->
-    <span>Hello {{ userSession.username }}!</span>
+    <button class="user-menu" matIconButton [matMenuTriggerFor]="menu" aria-label="user menu">
+      <mat-icon>person</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>logout</mat-icon>
+        <span>Sign out</span>
+      </button>
+    </mat-menu>
   } @else {
     <a matButton="filled" routerLink="/signin">Sign in</a>
     <a matButton="filled" routerLink="/signup">Sign up</a>
